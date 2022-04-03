@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta property="og:title" content="볼빨간사춘기 팬명록" />
+    <meta property="og:description" content="볼빨간사춘기에게 따듯한 응원한마디!" />
+    <meta property="og:image" content="http://img.segye.com/content/image/2020/07/03/20200703519586.jpg" />
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+    <title>1주차 과제 팬명록</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo&display=swap" rel="stylesheet">
+    <style>
+        * {
+            /*폰트는 나눔명조를 사용한다*/
+            font-family: 'Nanum Myeongjo', serif;
+        }
+
+        .mytitle {
+            width: 100%; /*가로를 꽉 채운다 */
+            height: 250px;
+            background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("http://img.segye.com/content/image/2020/07/03/20200703519586.jpg");
+            background-position: center;
+            background-size: cover;
+
+            color: white;
+
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            /*display flex 4형제
+            flex-direction: 내부 요소 정렬(가로, 세로)
+            justify-content: 세로로 어떻게 정렬할 것인가
+            align-items: 가로로 어떻게 정렬할 것인가.
+            */
+        }
+
+        .mypost {
+            max-width: 500px;
+            width: 95%;
+            margin: 15px auto 0 auto;
+
+            box-shadow: 0px 0px 3px 0px gray;
+            padding: 20px;
+
+        }
+
+        .input-group textarea {
+            margin-top: 5px;
+            height: 120px;
+
+        }
+
+        .submit_btn {
+
+            margin: 10px auto;
+
+        }
+
+        /*quo_wrap 클래스에 부트스트랩 card- quote 항목을 여러개 추가한 형식*/
+        .quo_wrap {
+
+            max-width: 500px;
+            width: 95%;
+            margin: 15px auto 0 auto;
+        }
+
+        .card {
+            margin-bottom: 10px;
+
+        }
+    </style>
+    <script>
+        $(document).ready(function () {
+
+            $.ajax({
+                type: "GET",
+                url: "http://spartacodingclub.shop/sparta_api/weather/seoul",
+                data: {},
+                success: function (response) {
+                    let temp = response["temp"];
+
+                    $('#temp').text(temp);
+
+                }
+            })
+
+           show_comment();
+        });
+
+        function show_comment(){
+            $.ajax({
+                type:"GET",
+                url:"/homework",
+                data:{},
+               success : function(response){
+                   let rows = response['cheering']
+                    for( let i =0; i < rows.length; i++) {
+                        let nickname = rows[i]['nickname']
+                        let comment = rows[i]['comment']
+
+                        let temp_html=`
+                         <div class="card-body">
+            <blockquote class="blockquote mb-0">
+                <p>${comment}</p>
+                <footer class="blockquote-footer">${nickname}
+                </footer>
+            </blockquote>
+        </div>
+                        `;
+                        $('#cheer-wrap').append(temp_html);
+                    }
+
+                }
+            });
+        }
+
+        function save_comment() {
+            let nickname = $('#nickname').val()
+            let comment = $('#comment').val()
+              $.ajax({
+                type:"POST",
+                url:"/homework",
+                data:{nickname_give:nickname, comment_give:comment},
+                success: function(response){
+                    console.log(response)
+                    alert(response["msg"])
+                    window.location.reload()
+                }
+            });
+        }
+    </script>
+
+</head>
+
+<body>
+<div class="mytitle">
+    <h1>볼빨간사춘기 팬명록</h1>
+
+    <p>현재 기온 : <span id="temp"></span>도</p>
+</div>
+<!--    응원글 남기기 화면-->
+<div class="mypost" id="post-box">
+    <div class="form-floating mb-3">
+        <input id="nickname" type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
+        <label for="floatingInput">닉네임</label>
+    </div>
+    <div class="input-group">
+        <textarea id="comment" class="form-control" aria-label="With textarea" placeholder="응원댓글"></textarea>
+    </div>
+
+    <button type="button" class="submit_btn btn btn-dark " onclick="save_comment()">응원 남기기</button>
+</div>
+<!--    응원글 목록 화면-->
+<div id="cheer-wrap" class="quo_wrap">
+
+
+</div>
+</body>
+
+</html>
